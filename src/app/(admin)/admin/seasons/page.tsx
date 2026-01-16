@@ -6,9 +6,29 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import { Checkbox } from '@/components/ui/checkbox'
 import Link from 'next/link'
 
@@ -62,10 +82,7 @@ export default function SeasonsPage() {
   }
 
   const loadTeams = async () => {
-    const { data, error } = await supabase
-      .from('teams')
-      .select('id, name')
-      .order('name')
+    const { data, error } = await supabase.from('teams').select('id, name').order('name')
 
     if (!error && data) {
       setTeams(data)
@@ -115,7 +132,11 @@ export default function SeasonsPage() {
   }
 
   const generateGameDays = async (season: Season) => {
-    if (!confirm('Generate game days for this season? This will create game day entries based on the recurring schedule.')) {
+    if (
+      !confirm(
+        'Generate game days for this season? This will create game day entries based on the recurring schedule.'
+      )
+    ) {
       return
     }
 
@@ -143,9 +164,7 @@ export default function SeasonsPage() {
       currentDate.setDate(currentDate.getDate() + 7) // Next week
     }
 
-    const { error: insertError } = await supabase
-      .from('game_days')
-      .insert(gameDays)
+    const { error: insertError } = await supabase.from('game_days').insert(gameDays)
 
     if (insertError) {
       setError('Failed to generate game days')
@@ -172,17 +191,14 @@ export default function SeasonsPage() {
 
   const openTeamDialog = async (seasonId: string) => {
     setCurrentSeasonId(seasonId)
-    
+
     // Load already selected teams for this season
-    const { data } = await supabase
-      .from('season_teams')
-      .select('team_id')
-      .eq('season_id', seasonId)
+    const { data } = await supabase.from('season_teams').select('team_id').eq('season_id', seasonId)
 
     if (data) {
-      setSelectedTeams(new Set(data.map(st => st.team_id)))
+      setSelectedTeams(new Set(data.map((st) => st.team_id)))
     }
-    
+
     setIsTeamDialogOpen(true)
   }
 
@@ -193,21 +209,16 @@ export default function SeasonsPage() {
     setError(null)
 
     // Delete existing teams
-    await supabase
-      .from('season_teams')
-      .delete()
-      .eq('season_id', currentSeasonId)
+    await supabase.from('season_teams').delete().eq('season_id', currentSeasonId)
 
     // Insert selected teams
-    const teamsToInsert = Array.from(selectedTeams).map(teamId => ({
+    const teamsToInsert = Array.from(selectedTeams).map((teamId) => ({
       season_id: currentSeasonId,
       team_id: teamId,
     }))
 
     if (teamsToInsert.length > 0) {
-      const { error: insertError } = await supabase
-        .from('season_teams')
-        .insert(teamsToInsert)
+      const { error: insertError } = await supabase.from('season_teams').insert(teamsToInsert)
 
       if (insertError) {
         setError('Failed to save teams')
@@ -232,7 +243,11 @@ export default function SeasonsPage() {
   }
 
   const deleteSeason = async (seasonId: string, seasonName: string) => {
-    if (!confirm(`Are you sure you want to delete "${seasonName}"? This will also delete all associated game days and results. This cannot be undone.`)) {
+    if (
+      !confirm(
+        `Are you sure you want to delete "${seasonName}"? This will also delete all associated game days and results. This cannot be undone.`
+      )
+    ) {
       return
     }
 
@@ -248,30 +263,18 @@ export default function SeasonsPage() {
         .eq('season_id', seasonId)
 
       if (gameDays && gameDays.length > 0) {
-        const gameDayIds = gameDays.map(gd => gd.id)
-        await supabase
-          .from('game_day_results')
-          .delete()
-          .in('game_day_id', gameDayIds)
+        const gameDayIds = gameDays.map((gd) => gd.id)
+        await supabase.from('game_day_results').delete().in('game_day_id', gameDayIds)
       }
 
       // Delete game days
-      await supabase
-        .from('game_days')
-        .delete()
-        .eq('season_id', seasonId)
+      await supabase.from('game_days').delete().eq('season_id', seasonId)
 
       // Delete season teams
-      await supabase
-        .from('season_teams')
-        .delete()
-        .eq('season_id', seasonId)
+      await supabase.from('season_teams').delete().eq('season_id', seasonId)
 
       // Delete the season
-      const { error: deleteError } = await supabase
-        .from('seasons')
-        .delete()
-        .eq('id', seasonId)
+      const { error: deleteError } = await supabase.from('seasons').delete().eq('id', seasonId)
 
       if (deleteError) {
         setError('Failed to delete season')
@@ -289,22 +292,22 @@ export default function SeasonsPage() {
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 relative overflow-hidden py-8">
+    <div className="from-background to-muted/30 relative min-h-screen overflow-hidden bg-gradient-to-b py-8">
       {/* Decorative background */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="w-[1000px] h-[700px] opacity-[0.03] relative">
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <div className="relative h-[700px] w-[1000px] opacity-[0.03]">
           <img
             src="/images/volleyball-players-dark.png"
             alt=""
-            className="w-full h-full object-contain"
+            className="h-full w-full object-contain"
           />
         </div>
       </div>
-      
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8 flex justify-between items-center">
+
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Manage Seasons</h1>
+            <h1 className="text-foreground text-3xl font-bold">Manage Seasons</h1>
             <p className="text-muted-foreground mt-2">Create and manage league seasons</p>
           </div>
           <Link href="/admin">
@@ -312,24 +315,16 @@ export default function SeasonsPage() {
           </Link>
         </div>
 
-        {error && (
-          <div className="mb-4 text-sm text-red-600 bg-red-50 p-3 rounded">
-            {error}
-          </div>
-        )}
+        {error && <div className="mb-4 rounded bg-red-50 p-3 text-sm text-red-600">{error}</div>}
         {success && (
-          <div className="mb-4 text-sm text-green-600 bg-green-50 p-3 rounded">
-            {success}
-          </div>
+          <div className="mb-4 rounded bg-green-50 p-3 text-sm text-green-600">{success}</div>
         )}
 
-        <div className="grid lg:grid-cols-2 gap-8 mb-8">
+        <div className="mb-8 grid gap-8 lg:grid-cols-2">
           <Card>
             <CardHeader>
               <CardTitle>Create New Season</CardTitle>
-              <CardDescription>
-                Set up a new league season with recurring schedule
-              </CardDescription>
+              <CardDescription>Set up a new league season with recurring schedule</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -409,9 +404,7 @@ export default function SeasonsPage() {
         <Card>
           <CardHeader>
             <CardTitle>Existing Seasons</CardTitle>
-            <CardDescription>
-              Manage your league seasons
-            </CardDescription>
+            <CardDescription>Manage your league seasons</CardDescription>
           </CardHeader>
           <CardContent>
             {seasons.length > 0 ? (
@@ -430,15 +423,19 @@ export default function SeasonsPage() {
                     <TableRow key={season.id}>
                       <TableCell className="font-medium">{season.name}</TableCell>
                       <TableCell>
-                        {new Date(season.start_date).toLocaleDateString()} - {new Date(season.end_date).toLocaleDateString()}
+                        {new Date(season.start_date).toLocaleDateString()} -{' '}
+                        {new Date(season.end_date).toLocaleDateString()}
                       </TableCell>
                       <TableCell>
-                        {dayNames[season.recurring_config.day_of_week]} at {season.recurring_config.time}
+                        {dayNames[season.recurring_config.day_of_week]} at{' '}
+                        {season.recurring_config.time}
                       </TableCell>
                       <TableCell>
                         <Select
                           value={season.status}
-                          onValueChange={(value) => updateStatus(season.id, value as 'draft' | 'active' | 'completed')}
+                          onValueChange={(value) =>
+                            updateStatus(season.id, value as 'draft' | 'active' | 'completed')
+                          }
                         >
                           <SelectTrigger className="w-32">
                             <SelectValue />
@@ -451,7 +448,7 @@ export default function SeasonsPage() {
                         </Select>
                       </TableCell>
                       <TableCell>
-                        <div className="flex gap-2 flex-wrap">
+                        <div className="flex flex-wrap gap-2">
                           <Button
                             size="sm"
                             variant="outline"
@@ -470,7 +467,7 @@ export default function SeasonsPage() {
                           <Button
                             size="sm"
                             variant="destructive"
-                            className="bg-red-600 hover:bg-red-700 text-white"
+                            className="bg-red-600 text-white hover:bg-red-700"
                             onClick={() => deleteSeason(season.id, season.name)}
                             disabled={loading}
                           >
@@ -483,9 +480,7 @@ export default function SeasonsPage() {
                 </TableBody>
               </Table>
             ) : (
-              <p className="text-gray-500 text-center py-8">
-                No seasons created yet
-              </p>
+              <p className="py-8 text-center text-gray-500">No seasons created yet</p>
             )}
           </CardContent>
         </Card>
@@ -498,7 +493,7 @@ export default function SeasonsPage() {
                 Choose which teams will participate in this season
               </DialogDescription>
             </DialogHeader>
-            <div className="space-y-4 max-h-96 overflow-y-auto">
+            <div className="max-h-96 space-y-4 overflow-y-auto">
               {teams.map((team) => (
                 <div key={team.id} className="flex items-center space-x-2">
                   <Checkbox
@@ -508,14 +503,14 @@ export default function SeasonsPage() {
                   />
                   <label
                     htmlFor={team.id}
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    className="cursor-pointer text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
                     {team.name}
                   </label>
                 </div>
               ))}
             </div>
-            <div className="flex justify-end gap-2 mt-4">
+            <div className="mt-4 flex justify-end gap-2">
               <Button variant="outline" onClick={() => setIsTeamDialogOpen(false)}>
                 Cancel
               </Button>
@@ -529,4 +524,3 @@ export default function SeasonsPage() {
     </div>
   )
 }
-

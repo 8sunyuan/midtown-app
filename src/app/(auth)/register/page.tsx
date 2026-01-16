@@ -37,6 +37,7 @@ export default function RegisterPage() {
           data: {
             display_name: displayName,
           },
+          emailRedirectTo: `${window.location.origin}/dashboard`,
         },
       })
 
@@ -55,28 +56,26 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0d1f15] via-[#1a3a28] to-[#0d1f15] px-4 py-12 relative overflow-hidden">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-[#0d1f15] via-[#1a3a28] to-[#0d1f15] px-4 py-12">
       {/* Decorative elements */}
-      <div className="absolute top-20 right-20 w-72 h-72 bg-[#4ade80]/10 rounded-full blur-3xl" />
-      <div className="absolute bottom-20 left-20 w-96 h-96 bg-[#4ade80]/5 rounded-full blur-3xl" />
-      
+      <div className="absolute top-20 right-20 h-72 w-72 rounded-full bg-[#4ade80]/10 blur-3xl" />
+      <div className="absolute bottom-20 left-20 h-96 w-96 rounded-full bg-[#4ade80]/5 blur-3xl" />
+
       <div className="relative w-full max-w-md">
         {/* Logo */}
-        <div className="text-center mb-8">
+        <div className="mb-8 text-center">
           <Link href="/" className="inline-block">
-            <span className="text-3xl font-bold bg-gradient-to-r from-[#4ade80] to-[#22c55e] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#4ade80] to-[#22c55e] bg-clip-text text-3xl font-bold text-transparent">
               Midtown Runs
             </span>
           </Link>
-          <p className="text-gray-400 mt-2">Volleyball League</p>
+          <p className="mt-2 text-gray-400">Volleyball League</p>
         </div>
-        
-        <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-sm">
-          <CardHeader className="text-center pb-2">
+
+        <Card className="border-0 bg-white/95 shadow-2xl backdrop-blur-sm">
+          <CardHeader className="pb-2 text-center">
             <CardTitle className="text-2xl">Create Account</CardTitle>
-            <CardDescription>
-              Join the Midtown Runs community
-            </CardDescription>
+            <CardDescription>Join the Midtown Runs community</CardDescription>
           </CardHeader>
           <CardContent className="pt-4">
             <form onSubmit={handleRegister} className="space-y-4">
@@ -119,20 +118,20 @@ export default function RegisterPage() {
                   minLength={6}
                   className="h-11"
                 />
-                <p className="text-xs text-muted-foreground">
-                  Must be at least 6 characters long
-                </p>
+                <p className="text-muted-foreground text-xs">Must be at least 6 characters long</p>
               </div>
               {error && (
-                <div className="text-sm text-red-600 bg-red-50 p-3 rounded-lg">
-                  {error}
-                </div>
+                <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</div>
               )}
-              <Button type="submit" className="w-full h-11 text-base font-semibold" disabled={loading}>
+              <Button
+                type="submit"
+                className="h-11 w-full text-base font-semibold"
+                disabled={loading}
+              >
                 {loading ? 'Creating account...' : 'Create Account'}
               </Button>
             </form>
-            <div className="mt-6 text-center text-sm text-muted-foreground">
+            <div className="text-muted-foreground mt-6 text-center text-sm">
               Already have an account?{' '}
               <Link href="/login" className="text-primary font-medium hover:underline">
                 Sign in
@@ -140,12 +139,11 @@ export default function RegisterPage() {
             </div>
           </CardContent>
         </Card>
-        
-        <p className="text-center text-gray-500 text-sm mt-8">
+
+        <p className="mt-8 text-center text-sm text-gray-500">
           © 2026 Midtown Runs Volleyball League
         </p>
       </div>
     </div>
   )
 }
-

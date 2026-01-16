@@ -16,16 +16,14 @@ export default function Error({
   }, [error])
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 flex items-center justify-center px-4">
-      <Card className="max-w-md w-full">
+    <div className="from-background to-muted/30 flex min-h-screen items-center justify-center bg-gradient-to-b px-4">
+      <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Something went wrong!</CardTitle>
-          <CardDescription>
-            An error occurred while loading this page
-          </CardDescription>
+          <CardDescription>An error occurred while loading this page</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground mb-4">
+          <p className="text-muted-foreground mb-4 text-sm">
             {error.message || 'An unexpected error occurred'}
           </p>
           <Button onClick={reset}>Try again</Button>
@@ -34,4 +32,3 @@ export default function Error({
     </div>
   )
 }
-

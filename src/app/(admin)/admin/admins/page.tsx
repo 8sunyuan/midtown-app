@@ -6,7 +6,14 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import Link from 'next/link'
 
 type AdminUser = {
@@ -33,14 +40,16 @@ export default function AdminManagementPage() {
   const loadAdmins = async () => {
     const { data, error } = await supabase
       .from('admin_users')
-      .select(`
+      .select(
+        `
         user_id,
         granted_at,
         users (
           email,
           display_name
         )
-      `)
+      `
+      )
       .order('granted_at', { ascending: false })
 
     if (!error && data) {
@@ -98,10 +107,7 @@ export default function AdminManagementPage() {
       return
     }
 
-    const { error } = await supabase
-      .from('admin_users')
-      .delete()
-      .eq('user_id', userId)
+    const { error } = await supabase.from('admin_users').delete().eq('user_id', userId)
 
     if (error) {
       setError('Failed to remove admin')
@@ -112,22 +118,22 @@ export default function AdminManagementPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 relative overflow-hidden py-8">
+    <div className="from-background to-muted/30 relative min-h-screen overflow-hidden bg-gradient-to-b py-8">
       {/* Decorative background */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="w-[1000px] h-[700px] opacity-[0.03] relative">
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <div className="relative h-[700px] w-[1000px] opacity-[0.03]">
           <img
             src="/images/volleyball-players-dark.png"
             alt=""
-            className="w-full h-full object-contain"
+            className="h-full w-full object-contain"
           />
         </div>
       </div>
-      
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8 flex justify-between items-center">
+
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Manage Admins</h1>
+            <h1 className="text-foreground text-3xl font-bold">Manage Admins</h1>
             <p className="text-muted-foreground mt-2">Add or remove administrator access</p>
           </div>
           <Link href="/admin">
@@ -135,13 +141,11 @@ export default function AdminManagementPage() {
           </Link>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid gap-8 md:grid-cols-2">
           <Card>
             <CardHeader>
               <CardTitle>Add New Admin</CardTitle>
-              <CardDescription>
-                Grant administrator access to a registered user
-              </CardDescription>
+              <CardDescription>Grant administrator access to a registered user</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleAddAdmin} className="space-y-4">
@@ -156,19 +160,11 @@ export default function AdminManagementPage() {
                     required
                     disabled={loading}
                   />
-                  <p className="text-xs text-gray-500">
-                    The user must be registered already
-                  </p>
+                  <p className="text-xs text-gray-500">The user must be registered already</p>
                 </div>
-                {error && (
-                  <div className="text-sm text-red-600 bg-red-50 p-3 rounded">
-                    {error}
-                  </div>
-                )}
+                {error && <div className="rounded bg-red-50 p-3 text-sm text-red-600">{error}</div>}
                 {success && (
-                  <div className="text-sm text-green-600 bg-green-50 p-3 rounded">
-                    {success}
-                  </div>
+                  <div className="rounded bg-green-50 p-3 text-sm text-green-600">{success}</div>
                 )}
                 <Button type="submit" disabled={loading}>
                   {loading ? 'Adding...' : 'Add Admin'}
@@ -180,9 +176,7 @@ export default function AdminManagementPage() {
           <Card>
             <CardHeader>
               <CardTitle>Current Admins</CardTitle>
-              <CardDescription>
-                Users with administrator privileges
-              </CardDescription>
+              <CardDescription>Users with administrator privileges</CardDescription>
             </CardHeader>
             <CardContent>
               {admins.length > 0 ? (
@@ -220,9 +214,7 @@ export default function AdminManagementPage() {
                   </TableBody>
                 </Table>
               ) : (
-                <p className="text-gray-500 text-center py-8">
-                  No admins found
-                </p>
+                <p className="py-8 text-center text-gray-500">No admins found</p>
               )}
             </CardContent>
           </Card>
@@ -231,4 +223,3 @@ export default function AdminManagementPage() {
     </div>
   )
 }
-

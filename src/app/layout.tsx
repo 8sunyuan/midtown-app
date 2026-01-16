@@ -3,13 +3,13 @@ import { Syne, DM_Sans } from 'next/font/google'
 import './globals.css'
 import { Navigation } from '@/components/user/Navigation'
 
-const syne = Syne({ 
+const syne = Syne({
   subsets: ['latin'],
   variable: '--font-syne',
   display: 'swap',
 })
 
-const dmSans = DM_Sans({ 
+const dmSans = DM_Sans({
   subsets: ['latin'],
   variable: '--font-dm-sans',
   display: 'swap',
@@ -17,7 +17,8 @@ const dmSans = DM_Sans({
 
 export const metadata: Metadata = {
   title: 'Midtown Runs - Volleyball League',
-  description: 'Join the action! Manage your volleyball league with ease. Track teams, schedules, and standings.',
+  description:
+    'Join the action! Manage your volleyball league with ease. Track teams, schedules, and standings.',
 }
 
 export default function RootLayout({
@@ -34,4 +35,3 @@ export default function RootLayout({
     </html>
   )
 }
-

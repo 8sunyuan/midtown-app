@@ -7,8 +7,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 
 export default async function DashboardPage() {
   const supabase = await createClient()
-  
-  const { data: { user } } = await supabase.auth.getUser()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
     redirect('/login')
@@ -17,13 +19,15 @@ export default async function DashboardPage() {
   // Get user's teams
   const { data: teams } = await supabase
     .from('team_members')
-    .select(`
+    .select(
+      `
       teams (
         id,
         name,
         captain_id
       )
-    `)
+    `
+    )
     .eq('user_id', user.id)
     .eq('status', 'accepted')
 
@@ -31,14 +35,16 @@ export default async function DashboardPage() {
   const today = new Date().toISOString().split('T')[0]
   const { data: upcomingGames } = await supabase
     .from('game_days')
-    .select(`
+    .select(
+      `
       id,
       game_date,
       description,
       seasons (
         name
       )
-    `)
+    `
+    )
     .gte('game_date', today)
     .order('game_date', { ascending: true })
     .limit(5)
@@ -51,15 +57,15 @@ export default async function DashboardPage() {
     .single()
 
   const isAdmin = !!adminData
-  
+
   // Get user's display name
   const displayName = user.user_metadata?.display_name || user.email?.split('@')[0] || 'Player'
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 relative overflow-hidden">
+    <div className="from-background to-muted/30 relative min-h-screen overflow-hidden bg-gradient-to-b">
       {/* Decorative background - centered and larger */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="w-[1200px] h-[800px] opacity-[0.04] relative">
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <div className="relative h-[800px] w-[1200px] opacity-[0.04]">
           <Image
             src="/images/volleyball-players-light.png"
             alt=""
@@ -68,44 +74,74 @@ export default async function DashboardPage() {
           />
         </div>
       </div>
-      
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+      <div className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Welcome header */}
         <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-4xl font-bold text-foreground">
+            <h1 className="text-foreground text-4xl font-bold">
               Welcome back, <span className="text-primary">{displayName}</span>
             </h1>
-            <p className="text-muted-foreground mt-2">Here&apos;s what&apos;s happening with your league</p>
+            <p className="text-muted-foreground mt-2">
+              Here&apos;s what&apos;s happening with your league
+            </p>
           </div>
-          <div className="mt-4 md:mt-0 flex items-center gap-2 text-sm text-muted-foreground">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          <div className="text-muted-foreground mt-4 flex items-center gap-2 text-sm md:mt-0">
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
             </svg>
-            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+            {new Date().toLocaleDateString('en-US', {
+              weekday: 'long',
+              month: 'long',
+              day: 'numeric',
+              year: 'numeric',
+            })}
           </div>
         </div>
 
         {isAdmin && (
           <div className="mb-8">
-            <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
+            <Card className="from-primary/5 to-primary/10 border-primary/20 bg-gradient-to-r">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  <svg
+                    className="text-primary h-5 w-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                    />
                   </svg>
                   Admin Access
                 </CardTitle>
-                <CardDescription>
-                  You have administrator privileges
-                </CardDescription>
+                <CardDescription>You have administrator privileges</CardDescription>
               </CardHeader>
               <CardContent>
                 <Link href="/admin">
                   <Button>
                     Go to Admin Dashboard
-                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    <svg
+                      className="ml-1 h-4 w-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 7l5 5m0 0l-5 5m5-5H6"
+                      />
                     </svg>
                   </Button>
                 </Link>
@@ -114,25 +150,26 @@ export default async function DashboardPage() {
           </div>
         )}
 
-        <div className="grid md:grid-cols-2 gap-8 mb-8">
+        <div className="mb-8 grid gap-8 md:grid-cols-2">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <span className="text-xl">🏐</span>
                 My Teams
               </CardTitle>
-              <CardDescription>
-                Teams you&apos;re a member of
-              </CardDescription>
+              <CardDescription>Teams you&apos;re a member of</CardDescription>
             </CardHeader>
             <CardContent>
               {teams && teams.length > 0 ? (
                 <ul className="space-y-2">
                   {teams.map((team: any) => (
-                    <li key={team.teams.id} className="flex justify-between items-center p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+                    <li
+                      key={team.teams.id}
+                      className="bg-muted/50 hover:bg-muted flex items-center justify-between rounded-lg p-3 transition-colors"
+                    >
                       <span className="font-medium">{team.teams.name}</span>
                       {team.teams.captain_id === user.id && (
-                        <span className="text-xs bg-primary/10 text-primary font-medium px-2.5 py-1 rounded-full">
+                        <span className="bg-primary/10 text-primary rounded-full px-2.5 py-1 text-xs font-medium">
                           Captain
                         </span>
                       )}
@@ -140,7 +177,7 @@ export default async function DashboardPage() {
                   ))}
                 </ul>
               ) : (
-                <div className="text-center py-8">
+                <div className="py-8 text-center">
                   <p className="text-muted-foreground mb-4">You&apos;re not on any teams yet</p>
                   <Link href="/teams">
                     <Button>Create or Join a Team</Button>
@@ -156,24 +193,25 @@ export default async function DashboardPage() {
                 <span className="text-xl">📆</span>
                 Upcoming Games
               </CardTitle>
-              <CardDescription>
-                Next scheduled game days
-              </CardDescription>
+              <CardDescription>Next scheduled game days</CardDescription>
             </CardHeader>
             <CardContent>
               {upcomingGames && upcomingGames.length > 0 ? (
                 <ul className="space-y-2">
                   {upcomingGames.map((game: any) => (
-                    <li key={game.id} className="p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+                    <li
+                      key={game.id}
+                      className="bg-muted/50 hover:bg-muted rounded-lg p-3 transition-colors"
+                    >
                       <div className="font-medium">{game.seasons?.name}</div>
-                      <div className="text-sm text-muted-foreground">
+                      <div className="text-muted-foreground text-sm">
                         {new Date(game.game_date).toLocaleDateString()}
                       </div>
                     </li>
                   ))}
                 </ul>
               ) : (
-                <div className="text-center py-8">
+                <div className="py-8 text-center">
                   <p className="text-muted-foreground">No upcoming games scheduled</p>
                 </div>
               )}
@@ -183,17 +221,17 @@ export default async function DashboardPage() {
 
         {/* Quick Actions */}
         <div className="mb-6">
-          <h2 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h2>
+          <h2 className="text-foreground mb-4 text-lg font-semibold">Quick Actions</h2>
         </div>
-        
-        <div className="grid md:grid-cols-3 gap-6">
-          <Link href="/teams" className="block group">
-            <Card className="cursor-pointer h-full hover:-translate-y-2 hover:border-primary/40">
+
+        <div className="grid gap-6 md:grid-cols-3">
+          <Link href="/teams" className="group block">
+            <Card className="hover:border-primary/40 h-full cursor-pointer hover:-translate-y-2">
               <CardHeader className="pb-4">
-                <div className="w-14 h-14 bg-gradient-to-br from-[#2d5f3f] to-[#4ade80] rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg">
+                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#2d5f3f] to-[#4ade80] shadow-lg transition-transform group-hover:scale-110">
                   <span className="text-2xl">👥</span>
                 </div>
-                <CardTitle className="text-xl group-hover:text-primary transition-colors">
+                <CardTitle className="group-hover:text-primary text-xl transition-colors">
                   Teams
                 </CardTitle>
                 <CardDescription className="text-base">
@@ -203,13 +241,13 @@ export default async function DashboardPage() {
             </Card>
           </Link>
 
-          <Link href="/schedule" className="block group">
-            <Card className="cursor-pointer h-full hover:-translate-y-2 hover:border-primary/40">
+          <Link href="/schedule" className="group block">
+            <Card className="hover:border-primary/40 h-full cursor-pointer hover:-translate-y-2">
               <CardHeader className="pb-4">
-                <div className="w-14 h-14 bg-gradient-to-br from-[#2d5f3f] to-[#4ade80] rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg">
+                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#2d5f3f] to-[#4ade80] shadow-lg transition-transform group-hover:scale-110">
                   <span className="text-2xl">📅</span>
                 </div>
-                <CardTitle className="text-xl group-hover:text-primary transition-colors">
+                <CardTitle className="group-hover:text-primary text-xl transition-colors">
                   Schedule
                 </CardTitle>
                 <CardDescription className="text-base">
@@ -219,13 +257,13 @@ export default async function DashboardPage() {
             </Card>
           </Link>
 
-          <Link href="/standings" className="block group">
-            <Card className="cursor-pointer h-full hover:-translate-y-2 hover:border-primary/40">
+          <Link href="/standings" className="group block">
+            <Card className="hover:border-primary/40 h-full cursor-pointer hover:-translate-y-2">
               <CardHeader className="pb-4">
-                <div className="w-14 h-14 bg-gradient-to-br from-[#2d5f3f] to-[#4ade80] rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg">
+                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#2d5f3f] to-[#4ade80] shadow-lg transition-transform group-hover:scale-110">
                   <span className="text-2xl">🏆</span>
                 </div>
-                <CardTitle className="text-xl group-hover:text-primary transition-colors">
+                <CardTitle className="group-hover:text-primary text-xl transition-colors">
                   Standings
                 </CardTitle>
                 <CardDescription className="text-base">
@@ -239,4 +277,3 @@ export default async function DashboardPage() {
     </div>
   )
 }
-

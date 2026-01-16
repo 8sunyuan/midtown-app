@@ -8,6 +8,147 @@ This guide will walk you through deploying your volleyball league management app
 2. A Vercel account (free tier is sufficient)
 3. A GitHub account
 
+---
+
+## Multi-Environment Setup (Recommended)
+
+For a proper development workflow, set up three environments:
+
+| Environment | Supabase Project | Database | Deployment |
+|------------|------------------|----------|------------|
+| **Dev** | Local (Docker) or cloud dev project | Isolated test data | `localhost:3000` |
+| **Staging** | `midtown-staging` | Test data | `staging.yourapp.com` |
+| **Production** | `midtown-prod` | Real user data | `yourapp.com` |
+
+### Create Separate Supabase Projects
+
+In the [Supabase Dashboard](https://supabase.com/dashboard), create two projects:
+- `midtown-staging` (for staging/preview deployments)
+- `midtown-prod` (for production)
+
+Each project gets its own URL and API keys.
+
+### Environment Variables by Environment
+
+**`.env.local`** (local development - gitignored):
+```bash
+NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-local-anon-key
+# Or use your staging project for local dev:
+# NEXT_PUBLIC_SUPABASE_URL=https://your-staging-ref.supabase.co
+# NEXT_PUBLIC_SUPABASE_ANON_KEY=your-staging-anon-key
+```
+
+**Staging** (set in Vercel):
+```bash
+NEXT_PUBLIC_SUPABASE_URL=https://your-staging-ref.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-staging-anon-key
+```
+
+**Production** (set in Vercel):
+```bash
+NEXT_PUBLIC_SUPABASE_URL=https://your-prod-ref.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-prod-anon-key
+```
+
+### Vercel Environment Configuration
+
+In your Vercel project settings → **Environment Variables**, set different values per environment:
+
+| Variable | Development | Preview | Production |
+|----------|-------------|---------|------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | (optional) | staging URL | prod URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | (optional) | staging key | prod key |
+
+With this setup:
+- **Preview deployments** (PRs, branches) → use staging Supabase
+- **Production deployment** (`main` branch) → use production Supabase
+
+### Database Migrations per Environment
+
+Run migrations separately for each Supabase project:
+
+```bash
+# Deploy to staging
+npx supabase link --project-ref <staging-project-ref>
+npx supabase db push
+
+# Deploy to production
+npx supabase link --project-ref <prod-project-ref>
+npx supabase db push
+```
+
+**Tip:** Create a migration script for convenience:
+
+```bash
+#!/bin/bash
+# scripts/migrate.sh
+ENV=$1
+
+if [ "$ENV" = "staging" ]; then
+  PROJECT_REF="your-staging-ref"
+elif [ "$ENV" = "prod" ]; then
+  PROJECT_REF="your-prod-ref"
+else
+  echo "Usage: ./scripts/migrate.sh [staging|prod]"
+  exit 1
+fi
+
+npx supabase link --project-ref $PROJECT_REF
+npx supabase db push
+echo "✅ Migrations applied to $ENV"
+```
+
+### Local Development with Supabase CLI
+
+For fully isolated local development (requires Docker):
+
+```bash
+# Start local Supabase
+npx supabase start
+
+# This gives you:
+# - Local Postgres at localhost:54321
+# - Local Auth at localhost:54321/auth/v1
+# - Studio UI at localhost:54323
+
+# Stop when done
+npx supabase stop
+```
+
+### Email Redirect URLs
+
+The app automatically uses `window.location.origin` for email confirmation redirects, so it works correctly in all environments:
+
+- Local: `http://localhost:3000/dashboard`
+- Staging: `https://staging.yourapp.com/dashboard`
+- Production: `https://yourapp.com/dashboard`
+
+**Important:** Add all your domains to Supabase's allowed redirect URLs:
+
+1. Go to **Supabase Dashboard** → **Authentication** → **URL Configuration**
+2. Add to **Redirect URLs**:
+   - `http://localhost:3000/**`
+   - `https://staging.yourapp.com/**`
+   - `https://yourapp.com/**`
+
+### Environment Architecture Diagram
+
+```
+┌─────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│   Local     │     │    Staging      │     │   Production    │
+│ localhost   │     │ staging.app.com │     │   app.com       │
+└──────┬──────┘     └────────┬────────┘     └────────┬────────┘
+       │                     │                       │
+       ▼                     ▼                       ▼
+┌─────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│  Local DB   │     │ Supabase        │     │ Supabase        │
+│  (Docker)   │     │ Staging Project │     │ Prod Project    │
+└─────────────┘     └─────────────────┘     └─────────────────┘
+```
+
+---
+
 ## Step 1: Set Up Supabase
 
 1. **Create a Supabase project:**
@@ -143,13 +284,20 @@ This guide will walk you through deploying your volleyball league management app
 
 ### Required Variables
 
-- `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase project URL
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Your Supabase anonymous key
-- `INITIAL_ADMIN_EMAIL`: Email address of the first admin user
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL | `https://xxxxx.supabase.co` |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your Supabase anonymous/public key | `eyJhbGciOiJIUzI1NiIs...` |
 
 ### Optional Variables
 
-None at this time. Email notifications can be configured in the future.
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `INITIAL_ADMIN_EMAIL` | Email for first admin (for reference) | `admin@example.com` |
+
+### Per-Environment Configuration
+
+See the [Multi-Environment Setup](#multi-environment-setup-recommended) section for how to configure different values for dev, staging, and production.
 
 ## Post-Deployment Checklist
 

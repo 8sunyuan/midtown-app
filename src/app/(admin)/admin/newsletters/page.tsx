@@ -8,8 +8,21 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import Link from 'next/link'
 import { formatDateTime } from '@/lib/utils'
 
@@ -44,7 +57,8 @@ export default function NewslettersPage() {
   const loadNewsletters = async () => {
     const { data, error } = await supabase
       .from('newsletters')
-      .select(`
+      .select(
+        `
         id,
         title,
         content,
@@ -54,7 +68,8 @@ export default function NewslettersPage() {
           email,
           display_name
         )
-      `)
+      `
+      )
       .order('created_at', { ascending: false })
 
     if (!error && data) {
@@ -87,7 +102,9 @@ export default function NewslettersPage() {
     setLoading(true)
 
     try {
-      const { data: { user } } = await supabase.auth.getUser()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
       if (!user) {
         setError('You must be logged in')
         setLoading(false)
@@ -113,13 +130,11 @@ export default function NewslettersPage() {
         setSuccess('Newsletter updated successfully')
       } else {
         // Create new newsletter
-        const { error: insertError } = await supabase
-          .from('newsletters')
-          .insert({
-            title,
-            content,
-            created_by: user.id,
-          })
+        const { error: insertError } = await supabase.from('newsletters').insert({
+          title,
+          content,
+          created_by: user.id,
+        })
 
         if (insertError) {
           setError('Failed to create newsletter')
@@ -160,10 +175,7 @@ export default function NewslettersPage() {
       return
     }
 
-    const { error } = await supabase
-      .from('newsletters')
-      .delete()
-      .eq('id', newsletterId)
+    const { error } = await supabase.from('newsletters').delete().eq('id', newsletterId)
 
     if (error) {
       setError('Failed to delete newsletter')
@@ -174,22 +186,22 @@ export default function NewslettersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 relative overflow-hidden py-8">
+    <div className="from-background to-muted/30 relative min-h-screen overflow-hidden bg-gradient-to-b py-8">
       {/* Decorative background */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="w-[1000px] h-[700px] opacity-[0.03] relative">
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <div className="relative h-[700px] w-[1000px] opacity-[0.03]">
           <img
             src="/images/volleyball-players-dark.png"
             alt=""
-            className="w-full h-full object-contain"
+            className="h-full w-full object-contain"
           />
         </div>
       </div>
-      
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8 flex justify-between items-center">
+
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Newsletters</h1>
+            <h1 className="text-foreground text-3xl font-bold">Newsletters</h1>
             <p className="text-muted-foreground mt-2">Create and manage league announcements</p>
           </div>
           <div className="flex gap-2">
@@ -200,23 +212,15 @@ export default function NewslettersPage() {
           </div>
         </div>
 
-        {error && (
-          <div className="mb-4 text-sm text-red-600 bg-red-50 p-3 rounded">
-            {error}
-          </div>
-        )}
+        {error && <div className="mb-4 rounded bg-red-50 p-3 text-sm text-red-600">{error}</div>}
         {success && (
-          <div className="mb-4 text-sm text-green-600 bg-green-50 p-3 rounded">
-            {success}
-          </div>
+          <div className="mb-4 rounded bg-green-50 p-3 text-sm text-green-600">{success}</div>
         )}
 
         <Card>
           <CardHeader>
             <CardTitle>All Newsletters</CardTitle>
-            <CardDescription>
-              Manage your league newsletters and announcements
-            </CardDescription>
+            <CardDescription>Manage your league newsletters and announcements</CardDescription>
           </CardHeader>
           <CardContent>
             {newsletters.length > 0 ? (
@@ -232,24 +236,20 @@ export default function NewslettersPage() {
                 <TableBody>
                   {newsletters.map((newsletter) => (
                     <TableRow key={newsletter.id}>
-                      <TableCell className="font-medium">
-                        {newsletter.title}
-                      </TableCell>
+                      <TableCell className="font-medium">{newsletter.title}</TableCell>
                       <TableCell>
-                        <div className="text-sm">
-                          {formatDateTime(newsletter.created_at)}
-                        </div>
+                        <div className="text-sm">{formatDateTime(newsletter.created_at)}</div>
                         <div className="text-xs text-gray-500">
                           by {newsletter.users.display_name || newsletter.users.email}
                         </div>
                       </TableCell>
                       <TableCell>
                         {newsletter.published_at ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
                             Published
                           </span>
                         ) : (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                          <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">
                             Draft
                           </span>
                         )}
@@ -284,9 +284,7 @@ export default function NewslettersPage() {
                 </TableBody>
               </Table>
             ) : (
-              <p className="text-gray-500 text-center py-8">
-                No newsletters created yet
-              </p>
+              <p className="py-8 text-center text-gray-500">No newsletters created yet</p>
             )}
           </CardContent>
         </Card>
@@ -298,7 +296,9 @@ export default function NewslettersPage() {
                 {currentNewsletter ? 'Edit Newsletter' : 'Create Newsletter'}
               </DialogTitle>
               <DialogDescription>
-                {currentNewsletter ? 'Update your newsletter' : 'Create a new announcement for the league'}
+                {currentNewsletter
+                  ? 'Update your newsletter'
+                  : 'Create a new announcement for the league'}
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -327,11 +327,7 @@ export default function NewslettersPage() {
                 />
               </div>
 
-              {error && (
-                <div className="text-sm text-red-600 bg-red-50 p-3 rounded">
-                  {error}
-                </div>
-              )}
+              {error && <div className="rounded bg-red-50 p-3 text-sm text-red-600">{error}</div>}
 
               <div className="flex justify-end gap-2">
                 <Button
@@ -343,7 +339,7 @@ export default function NewslettersPage() {
                   Cancel
                 </Button>
                 <Button type="submit" disabled={loading}>
-                  {loading ? 'Saving...' : (currentNewsletter ? 'Update' : 'Create')}
+                  {loading ? 'Saving...' : currentNewsletter ? 'Update' : 'Create'}
                 </Button>
               </div>
             </form>
@@ -353,4 +349,3 @@ export default function NewslettersPage() {
     </div>
   )
 }
-

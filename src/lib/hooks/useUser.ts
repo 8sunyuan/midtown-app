@@ -17,7 +17,9 @@ export function useUser() {
     // Get user immediately
     const initUser = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser()
+        const {
+          data: { user },
+        } = await supabase.auth.getUser()
         if (mounted && user) {
           setUser(user)
         }
@@ -31,7 +33,9 @@ export function useUser() {
     initUser()
 
     // Listen for changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_, session) => {
       if (mounted) {
         setUser(session?.user ?? null)
         setLoading(false)
@@ -61,7 +65,7 @@ export function useUser() {
           .select('user_id')
           .eq('user_id', user.id)
           .maybeSingle()
-        
+
         if (mounted) {
           setIsAdmin(!!data)
         }
@@ -77,9 +81,10 @@ export function useUser() {
 
     checkAdmin().finally(() => clearTimeout(timeout))
 
-    return () => { mounted = false }
+    return () => {
+      mounted = false
+    }
   }, [user])
 
   return { user, isAdmin, loading }
 }
-

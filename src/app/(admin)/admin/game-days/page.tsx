@@ -7,9 +7,28 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -68,7 +87,8 @@ export default function GameDaysPage() {
   const loadGameDays = async (seasonId: string) => {
     const { data, error } = await supabase
       .from('game_days')
-      .select(`
+      .select(
+        `
         id,
         game_date,
         description,
@@ -76,7 +96,8 @@ export default function GameDaysPage() {
         seasons (
           name
         )
-      `)
+      `
+      )
       .eq('season_id', seasonId)
       .order('game_date', { ascending: true })
 
@@ -134,9 +155,9 @@ export default function GameDaysPage() {
           return
         }
 
-        const { data: { publicUrl } } = supabase.storage
-          .from('schedule-images')
-          .getPublicUrl(fileName)
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from('schedule-images').getPublicUrl(fileName)
 
         imageUrl = publicUrl
       }
@@ -167,38 +188,34 @@ export default function GameDaysPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 relative overflow-hidden py-8">
+    <div className="from-background to-muted/30 relative min-h-screen overflow-hidden bg-gradient-to-b py-8">
       {/* Decorative background */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="w-[1000px] h-[700px] opacity-[0.03] relative">
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <div className="relative h-[700px] w-[1000px] opacity-[0.03]">
           <img
             src="/images/volleyball-players-dark.png"
             alt=""
-            className="w-full h-full object-contain"
+            className="h-full w-full object-contain"
           />
         </div>
       </div>
-      
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8 flex justify-between items-center">
+
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Game Day Schedules</h1>
-            <p className="text-muted-foreground mt-2">Upload schedules and information for game days</p>
+            <h1 className="text-foreground text-3xl font-bold">Game Day Schedules</h1>
+            <p className="text-muted-foreground mt-2">
+              Upload schedules and information for game days
+            </p>
           </div>
           <Link href="/admin">
             <Button variant="outline">Back to Admin</Button>
           </Link>
         </div>
 
-        {error && (
-          <div className="mb-4 text-sm text-red-600 bg-red-50 p-3 rounded">
-            {error}
-          </div>
-        )}
+        {error && <div className="mb-4 rounded bg-red-50 p-3 text-sm text-red-600">{error}</div>}
         {success && (
-          <div className="mb-4 text-sm text-green-600 bg-green-50 p-3 rounded">
-            {success}
-          </div>
+          <div className="mb-4 rounded bg-green-50 p-3 text-sm text-green-600">{success}</div>
         )}
 
         <div className="mb-6">
@@ -220,9 +237,7 @@ export default function GameDaysPage() {
         <Card>
           <CardHeader>
             <CardTitle>Game Days</CardTitle>
-            <CardDescription>
-              Click on a game day to add schedule details
-            </CardDescription>
+            <CardDescription>Click on a game day to add schedule details</CardDescription>
           </CardHeader>
           <CardContent>
             {gameDays.length > 0 ? (
@@ -261,11 +276,7 @@ export default function GameDaysPage() {
                         )}
                       </TableCell>
                       <TableCell>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => openEditDialog(gameDay)}
-                        >
+                        <Button size="sm" variant="outline" onClick={() => openEditDialog(gameDay)}>
                           Edit Schedule
                         </Button>
                       </TableCell>
@@ -274,8 +285,10 @@ export default function GameDaysPage() {
                 </TableBody>
               </Table>
             ) : (
-              <p className="text-gray-500 text-center py-8">
-                {selectedSeason ? 'No game days found. Generate game days in season management first.' : 'Select a season to view game days'}
+              <p className="py-8 text-center text-gray-500">
+                {selectedSeason
+                  ? 'No game days found. Generate game days in season management first.'
+                  : 'Select a season to view game days'}
               </p>
             )}
           </CardContent>
@@ -286,12 +299,13 @@ export default function GameDaysPage() {
             <DialogHeader>
               <DialogTitle>Edit Game Day Schedule</DialogTitle>
               <DialogDescription>
-                {currentGameDay && new Date(currentGameDay.game_date).toLocaleDateString('en-US', {
-                  weekday: 'long',
-                  month: 'long',
-                  day: 'numeric',
-                  year: 'numeric',
-                })}
+                {currentGameDay &&
+                  new Date(currentGameDay.game_date).toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })}
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -316,15 +330,13 @@ export default function GameDaysPage() {
                   onChange={handleImageChange}
                   disabled={loading}
                 />
-                <p className="text-xs text-gray-500">
-                  Upload an image of the schedule (max 5MB)
-                </p>
+                <p className="text-xs text-gray-500">Upload an image of the schedule (max 5MB)</p>
               </div>
 
               {currentGameDay?.image_url && (
                 <div className="space-y-2">
                   <Label>Current Image</Label>
-                  <div className="relative w-full h-64 bg-gray-100 rounded">
+                  <div className="relative h-64 w-full rounded bg-gray-100">
                     <Image
                       src={currentGameDay.image_url}
                       alt="Schedule"
@@ -335,11 +347,7 @@ export default function GameDaysPage() {
                 </div>
               )}
 
-              {error && (
-                <div className="text-sm text-red-600 bg-red-50 p-3 rounded">
-                  {error}
-                </div>
-              )}
+              {error && <div className="rounded bg-red-50 p-3 text-sm text-red-600">{error}</div>}
 
               <div className="flex justify-end gap-2">
                 <Button
@@ -361,4 +369,3 @@ export default function GameDaysPage() {
     </div>
   )
 }
-

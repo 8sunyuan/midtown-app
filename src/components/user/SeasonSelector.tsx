@@ -22,13 +22,13 @@ export function SeasonSelector({ seasons, selectedSeasonId, basePath }: SeasonSe
 
   return (
     <div className="mb-6">
-      <label htmlFor="season" className="block text-sm font-medium text-muted-foreground mb-2">
+      <label htmlFor="season" className="text-muted-foreground mb-2 block text-sm font-medium">
         Select Season
       </label>
       <select
         id="season"
         name="season"
-        className="block w-64 rounded-lg border-border bg-white shadow-sm focus:border-primary focus:ring-primary p-2.5 border text-foreground"
+        className="border-border focus:border-primary focus:ring-primary text-foreground block w-64 rounded-lg border bg-white p-2.5 shadow-sm"
         defaultValue={selectedSeasonId}
         onChange={handleChange}
       >
@@ -41,4 +41,3 @@ export function SeasonSelector({ seasons, selectedSeasonId, basePath }: SeasonSe
     </div>
   )
 }
-

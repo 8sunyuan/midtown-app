@@ -6,8 +6,21 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import Link from 'next/link'
 
 type Season = {
@@ -89,13 +102,15 @@ export default function ResultsPage() {
   const loadTeams = async (seasonId: string) => {
     const { data, error } = await supabase
       .from('season_teams')
-      .select(`
+      .select(
+        `
         team_id,
         teams (
           id,
           name
         )
-      `)
+      `
+      )
       .eq('season_id', seasonId)
 
     if (!error && data) {
@@ -160,10 +175,7 @@ export default function ResultsPage() {
 
     try {
       // Delete existing results for this game day
-      await supabase
-        .from('game_results')
-        .delete()
-        .eq('game_day_id', selectedGameDay)
+      await supabase.from('game_results').delete().eq('game_day_id', selectedGameDay)
 
       // Insert new results
       const resultsToInsert = Array.from(results.values()).map((result) => ({
@@ -173,9 +185,7 @@ export default function ResultsPage() {
         sets_lost: result.sets_lost,
       }))
 
-      const { error: insertError } = await supabase
-        .from('game_results')
-        .insert(resultsToInsert)
+      const { error: insertError } = await supabase.from('game_results').insert(resultsToInsert)
 
       if (insertError) {
         setError('Failed to save results')
@@ -192,22 +202,22 @@ export default function ResultsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 relative overflow-hidden py-8">
+    <div className="from-background to-muted/30 relative min-h-screen overflow-hidden bg-gradient-to-b py-8">
       {/* Decorative background */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="w-[1000px] h-[700px] opacity-[0.03] relative">
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <div className="relative h-[700px] w-[1000px] opacity-[0.03]">
           <img
             src="/images/volleyball-players-dark.png"
             alt=""
-            className="w-full h-full object-contain"
+            className="h-full w-full object-contain"
           />
         </div>
       </div>
-      
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8 flex justify-between items-center">
+
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Enter Game Results</h1>
+            <h1 className="text-foreground text-3xl font-bold">Enter Game Results</h1>
             <p className="text-muted-foreground mt-2">Record sets won and lost for each team</p>
           </div>
           <Link href="/admin">
@@ -215,18 +225,12 @@ export default function ResultsPage() {
           </Link>
         </div>
 
-        {error && (
-          <div className="mb-4 text-sm text-red-600 bg-red-50 p-3 rounded">
-            {error}
-          </div>
-        )}
+        {error && <div className="mb-4 rounded bg-red-50 p-3 text-sm text-red-600">{error}</div>}
         {success && (
-          <div className="mb-4 text-sm text-green-600 bg-green-50 p-3 rounded">
-            {success}
-          </div>
+          <div className="mb-4 rounded bg-green-50 p-3 text-sm text-green-600">{success}</div>
         )}
 
-        <div className="grid md:grid-cols-2 gap-4 mb-6">
+        <div className="mb-6 grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="season">Select Season</Label>
             <Select value={selectedSeason} onValueChange={setSelectedSeason}>
@@ -273,9 +277,7 @@ export default function ResultsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Game Results</CardTitle>
-              <CardDescription>
-                Enter the number of sets won and lost for each team
-              </CardDescription>
+              <CardDescription>Enter the number of sets won and lost for each team</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit}>
@@ -301,7 +303,7 @@ export default function ResultsPage() {
                               onChange={(e) =>
                                 updateResult(team.id, 'sets_won', parseInt(e.target.value) || 0)
                               }
-                              className="w-24 mx-auto"
+                              className="mx-auto w-24"
                               disabled={loading}
                             />
                           </TableCell>
@@ -313,7 +315,7 @@ export default function ResultsPage() {
                               onChange={(e) =>
                                 updateResult(team.id, 'sets_lost', parseInt(e.target.value) || 0)
                               }
-                              className="w-24 mx-auto"
+                              className="mx-auto w-24"
                               disabled={loading}
                             />
                           </TableCell>
@@ -334,7 +336,7 @@ export default function ResultsPage() {
 
         {selectedSeason && teams.length === 0 && (
           <Card>
-            <CardContent className="text-center py-8">
+            <CardContent className="py-8 text-center">
               <p className="text-gray-500">
                 No teams found for this season. Add teams to the season first.
               </p>
@@ -345,4 +347,3 @@ export default function ResultsPage() {
     </div>
   )
 }
-

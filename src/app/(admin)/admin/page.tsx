@@ -5,8 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 
 export default async function AdminPage() {
   const supabase = await createClient()
-  
-  const { data: { user } } = await supabase.auth.getUser()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
     redirect('/login')
@@ -37,25 +39,25 @@ export default async function AdminPage() {
     .select('*', { count: 'exact', head: true })
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 relative overflow-hidden py-8">
+    <div className="from-background to-muted/30 relative min-h-screen overflow-hidden bg-gradient-to-b py-8">
       {/* Decorative background */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="w-[1000px] h-[700px] opacity-[0.03] relative">
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <div className="relative h-[700px] w-[1000px] opacity-[0.03]">
           <img
             src="/images/volleyball-players-dark.png"
             alt=""
-            className="w-full h-full object-contain"
+            className="h-full w-full object-contain"
           />
         </div>
       </div>
-      
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
+          <h1 className="text-foreground text-3xl font-bold">Admin Dashboard</h1>
           <p className="text-muted-foreground mt-2">Manage your volleyball league</p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
+        <div className="mb-8 grid gap-6 md:grid-cols-3">
           <Card>
             <CardHeader>
               <CardTitle className="text-4xl font-bold">{teamsCount || 0}</CardTitle>
@@ -78,69 +80,67 @@ export default async function AdminPage() {
           </Card>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Link href="/admin/seasons" className="block group">
-            <Card className="cursor-pointer h-full">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <Link href="/admin/seasons" className="group block">
+            <Card className="h-full cursor-pointer">
               <CardHeader>
-                <CardTitle className="group-hover:text-primary transition-colors">Manage Seasons</CardTitle>
-                <CardDescription>
-                  Create and manage league seasons
-                </CardDescription>
+                <CardTitle className="group-hover:text-primary transition-colors">
+                  Manage Seasons
+                </CardTitle>
+                <CardDescription>Create and manage league seasons</CardDescription>
               </CardHeader>
             </Card>
           </Link>
 
-          <Link href="/admin/game-days" className="block group">
-            <Card className="cursor-pointer h-full">
+          <Link href="/admin/game-days" className="group block">
+            <Card className="h-full cursor-pointer">
               <CardHeader>
-                <CardTitle className="group-hover:text-primary transition-colors">Game Day Schedules</CardTitle>
-                <CardDescription>
-                  Upload schedules and game information
-                </CardDescription>
+                <CardTitle className="group-hover:text-primary transition-colors">
+                  Game Day Schedules
+                </CardTitle>
+                <CardDescription>Upload schedules and game information</CardDescription>
               </CardHeader>
             </Card>
           </Link>
 
-          <Link href="/admin/results" className="block group">
-            <Card className="cursor-pointer h-full">
+          <Link href="/admin/results" className="group block">
+            <Card className="h-full cursor-pointer">
               <CardHeader>
-                <CardTitle className="group-hover:text-primary transition-colors">Enter Results</CardTitle>
-                <CardDescription>
-                  Record game results and update standings
-                </CardDescription>
+                <CardTitle className="group-hover:text-primary transition-colors">
+                  Enter Results
+                </CardTitle>
+                <CardDescription>Record game results and update standings</CardDescription>
               </CardHeader>
             </Card>
           </Link>
 
-          <Link href="/admin/newsletters" className="block group">
-            <Card className="cursor-pointer h-full">
+          <Link href="/admin/newsletters" className="group block">
+            <Card className="h-full cursor-pointer">
               <CardHeader>
-                <CardTitle className="group-hover:text-primary transition-colors">Newsletters</CardTitle>
-                <CardDescription>
-                  Post announcements and newsletters
-                </CardDescription>
+                <CardTitle className="group-hover:text-primary transition-colors">
+                  Newsletters
+                </CardTitle>
+                <CardDescription>Post announcements and newsletters</CardDescription>
               </CardHeader>
             </Card>
           </Link>
 
-          <Link href="/admin/admins" className="block group">
-            <Card className="cursor-pointer h-full">
+          <Link href="/admin/admins" className="group block">
+            <Card className="h-full cursor-pointer">
               <CardHeader>
-                <CardTitle className="group-hover:text-primary transition-colors">Manage Admins</CardTitle>
-                <CardDescription>
-                  Add or remove administrator access
-                </CardDescription>
+                <CardTitle className="group-hover:text-primary transition-colors">
+                  Manage Admins
+                </CardTitle>
+                <CardDescription>Add or remove administrator access</CardDescription>
               </CardHeader>
             </Card>
           </Link>
 
           <Link href="/dashboard" className="block">
-            <Card className="cursor-pointer h-full">
+            <Card className="h-full cursor-pointer">
               <CardHeader>
                 <CardTitle>Back to Dashboard</CardTitle>
-                <CardDescription>
-                  Return to user dashboard
-                </CardDescription>
+                <CardDescription>Return to user dashboard</CardDescription>
               </CardHeader>
             </Card>
           </Link>
@@ -149,4 +149,3 @@ export default async function AdminPage() {
     </div>
   )
 }
-
