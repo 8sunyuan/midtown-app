@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+@layer theme {
+  :root {
+    --background: 0 0% 98%;
+    --foreground: 150 25% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 150 25% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 150 25% 15%;
+    /* Volleyball green primary */
+    --primary: 145 45% 32%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 145 20% 95%;
+    --secondary-foreground: 145 45% 25%;
+    --muted: 150 10% 94%;
+    --muted-foreground: 150 10% 40%;
+    /* Green-tinted accent for hovers */
+    --accent: 145 30% 92%;
+    --accent-foreground: 145 45% 25%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 150 15% 88%;
+    --input: 150 15% 88%;
+    --ring: 145 45% 32%;
+    --radius: 0.625rem;
+  }
+
+  .dark {
+    --background: 150 20% 8%;
+    --foreground: 0 0% 98%;
+    --card: 150 15% 12%;
+    --card-foreground: 0 0% 98%;
+    --popover: 150 15% 12%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 145 55% 50%;
+    --primary-foreground: 150 30% 10%;
+    --secondary: 150 15% 18%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 150 15% 18%;
+    --muted-foreground: 150 10% 60%;
+    --accent: 150 20% 20%;
+    --accent-foreground: 145 55% 60%;
+    --destructive: 0 62% 40%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 150 15% 20%;
+    --input: 150 15% 20%;
+    --ring: 145 55% 50%;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--font-dm-sans), system-ui, sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-syne), system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+}
+
+/* Global transitions for interactive elements */
+@layer utilities {
+  .interactive {
+    @apply transition-all duration-200 ease-out;
+  }
+  
+  .hover-lift {
+    @apply transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg;
+  }
+  
+  .hover-glow {
+    @apply transition-all duration-200 ease-out hover:shadow-[0_0_20px_rgba(45,95,63,0.15)];
+  }
+}
+
