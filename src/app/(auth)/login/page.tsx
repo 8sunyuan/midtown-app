@@ -47,10 +47,10 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-[#0d1f15] via-[#1a3a28] to-[#0d1f15] px-4">
+    <div className="relative flex min-h-[100svh] items-center justify-center overflow-hidden bg-gradient-to-br from-[#0d1f15] via-[#1a3a28] to-[#0d1f15] px-4 py-8">
       {/* Decorative elements */}
-      <div className="absolute top-20 left-20 h-72 w-72 rounded-full bg-[#4ade80]/10 blur-3xl" />
-      <div className="absolute right-20 bottom-20 h-96 w-96 rounded-full bg-[#4ade80]/5 blur-3xl" />
+      <div className="absolute top-10 left-5 h-48 w-48 rounded-full bg-[#4ade80]/10 blur-3xl sm:top-20 sm:left-20 sm:h-72 sm:w-72" />
+      <div className="absolute right-5 bottom-10 h-64 w-64 rounded-full bg-[#4ade80]/5 blur-3xl sm:right-20 sm:bottom-20 sm:h-96 sm:w-96" />
 
       <div className="relative w-full max-w-md">
         {/* Logo */}

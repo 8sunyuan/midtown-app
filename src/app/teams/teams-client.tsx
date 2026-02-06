@@ -363,7 +363,7 @@ export function TeamsClient({ user, initialTeams }: TeamsClientProps) {
   }
 
   return (
-    <div className="from-background to-muted/30 relative min-h-screen overflow-hidden bg-gradient-to-b py-8">
+    <div className="from-background to-muted/30 relative min-h-screen overflow-hidden bg-gradient-to-b py-6 sm:py-8">
       {/* Decorative background */}
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
         <div className="relative h-[700px] w-[1000px] opacity-[0.03]">
@@ -376,21 +376,28 @@ export function TeamsClient({ user, initialTeams }: TeamsClientProps) {
       </div>
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h1 className="text-foreground text-3xl font-bold">My Teams</h1>
-            <p className="text-muted-foreground mt-2">Manage your volleyball teams</p>
-          </div>
-          <div className="flex gap-3">
-            <Link href="/teams/report">
-              <Button
-                variant="outline"
-                className="border-[#4ade80]/50 bg-[#4ade80]/10 text-[#4ade80] hover:bg-[#4ade80] hover:text-black"
-              >
-                📊 Report Scores
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h1 className="text-foreground text-2xl font-bold sm:text-3xl">My Teams</h1>
+              <p className="text-muted-foreground mt-1 text-sm sm:mt-2 sm:text-base">
+                Manage your volleyball teams
+              </p>
+            </div>
+            <div className="flex gap-2 sm:gap-3">
+              <Link href="/teams/report">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-[#4ade80]/50 bg-[#4ade80]/10 text-[#4ade80] hover:bg-[#4ade80] hover:text-black sm:size-default"
+                >
+                  Report Scores
+                </Button>
+              </Link>
+              <Button size="sm" onClick={() => setIsCreateDialogOpen(true)} className="sm:size-default">
+                Create Team
               </Button>
-            </Link>
-            <Button onClick={() => setIsCreateDialogOpen(true)}>Create Team</Button>
+            </div>
           </div>
         </div>
 
