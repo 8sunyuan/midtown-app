@@ -50,9 +50,10 @@ type TeamInvite = {
 interface TeamsClientProps {
   user: User
   initialTeams: Team[]
+  isAdmin?: boolean
 }
 
-export function TeamsClient({ user, initialTeams }: TeamsClientProps) {
+export function TeamsClient({ user, initialTeams, isAdmin = false }: TeamsClientProps) {
   const [myTeams, setMyTeams] = useState<Team[]>(initialTeams)
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null)
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([])
@@ -69,24 +70,36 @@ export function TeamsClient({ user, initialTeams }: TeamsClientProps) {
   const [supabase] = useState(() => createClient())
 
   const loadMyTeams = async () => {
-    const { data, error } = await supabase
-      .from('team_members')
-      .select(
-        `
-        teams (
-          id,
-          name,
-          captain_id,
-          created_at
-        )
-      `
-      )
-      .eq('user_id', user.id)
-      .eq('status', 'accepted')
+    if (isAdmin) {
+      // Admins see all teams
+      const { data, error } = await supabase
+        .from('teams')
+        .select('id, name, captain_id, created_at')
+        .order('name', { ascending: true })
 
-    if (!error && data) {
-      const teams = data.map((tm: any) => tm.teams).filter(Boolean)
-      setMyTeams(teams)
+      if (!error && data) {
+        setMyTeams(data as Team[])
+      }
+    } else {
+      const { data, error } = await supabase
+        .from('team_members')
+        .select(
+          `
+          teams (
+            id,
+            name,
+            captain_id,
+            created_at
+          )
+        `
+        )
+        .eq('user_id', user.id)
+        .eq('status', 'accepted')
+
+      if (!error && data) {
+        const teams = data.map((tm: any) => tm.teams).filter(Boolean)
+        setMyTeams(teams)
+      }
     }
   }
 
@@ -362,6 +375,29 @@ export function TeamsClient({ user, initialTeams }: TeamsClientProps) {
     }
   }
 
+  const handleDeleteTeam = async (team: Team) => {
+    if (
+      !confirm(
+        `Are you sure you want to delete "${team.name}"? This will remove all members, invites, and associated game results. This action cannot be undone.`
+      )
+    )
+      return
+
+    setError(null)
+    setSuccess(null)
+
+    const { error } = await supabase.from('teams').delete().eq('id', team.id)
+
+    if (error) {
+      setError('Failed to delete team')
+    } else {
+      setSuccess(`Team "${team.name}" has been deleted`)
+      setIsManageDialogOpen(false)
+      setSelectedTeam(null)
+      loadMyTeams()
+    }
+  }
+
   return (
     <div className="from-background to-muted/30 relative min-h-screen overflow-hidden bg-gradient-to-b py-6 sm:py-8">
       {/* Decorative background */}
@@ -379,9 +415,11 @@ export function TeamsClient({ user, initialTeams }: TeamsClientProps) {
         <div className="mb-6 sm:mb-8">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="text-foreground text-2xl font-bold sm:text-3xl">My Teams</h1>
+              <h1 className="text-foreground text-2xl font-bold sm:text-3xl">
+                {isAdmin ? 'All Teams' : 'My Teams'}
+              </h1>
               <p className="text-muted-foreground mt-1 text-sm sm:mt-2 sm:text-base">
-                Manage your volleyball teams
+                {isAdmin ? 'Manage all volleyball teams (Admin)' : 'Manage your volleyball teams'}
               </p>
             </div>
             <div className="flex gap-2 sm:gap-3">
@@ -423,10 +461,19 @@ export function TeamsClient({ user, initialTeams }: TeamsClientProps) {
                     {team.captain_id === user.id ? 'You are the captain' : 'Team member'}
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="flex gap-2">
                   <Button variant="outline" onClick={() => openManageDialog(team)}>
                     View Roster
                   </Button>
+                  {isAdmin && (
+                    <Button
+                      size="default"
+                      className="bg-red-600 text-white hover:bg-red-700"
+                      onClick={() => handleDeleteTeam(team)}
+                    >
+                      Delete Team
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             ))}

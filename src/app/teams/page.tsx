@@ -12,23 +12,44 @@ export default async function TeamsPage() {
     redirect('/login')
   }
 
-  // Get user's teams server-side for initial data
-  const { data: teamsData } = await supabase
-    .from('team_members')
-    .select(
-      `
-      teams (
-        id,
-        name,
-        captain_id,
-        created_at
-      )
-    `
-    )
+  // Check if user is admin
+  const { data: adminData } = await supabase
+    .from('admin_users')
+    .select('user_id')
     .eq('user_id', user.id)
-    .eq('status', 'accepted')
+    .maybeSingle()
 
-  const initialTeams = teamsData?.map((tm: any) => tm.teams).filter(Boolean) || []
+  const isAdmin = !!adminData
 
-  return <TeamsClient user={user} initialTeams={initialTeams} />
+  let initialTeams: any[] = []
+
+  if (isAdmin) {
+    // Admins see all teams
+    const { data: allTeams } = await supabase
+      .from('teams')
+      .select('id, name, captain_id, created_at')
+      .order('name', { ascending: true })
+
+    initialTeams = allTeams || []
+  } else {
+    // Regular users see only their teams
+    const { data: teamsData } = await supabase
+      .from('team_members')
+      .select(
+        `
+        teams (
+          id,
+          name,
+          captain_id,
+          created_at
+        )
+      `
+      )
+      .eq('user_id', user.id)
+      .eq('status', 'accepted')
+
+    initialTeams = teamsData?.map((tm: any) => tm.teams).filter(Boolean) || []
+  }
+
+  return <TeamsClient user={user} initialTeams={initialTeams} isAdmin={isAdmin} />
 }
