@@ -101,7 +101,7 @@ export default function ReportScoresPage() {
         return
       }
 
-      const seasonIds = seasonTeams.map((st) => st.season_id)
+      const seasonIds = (seasonTeams as any).map((st: any) => st.season_id)
 
       // Get game days for those seasons (only past or today)
       const today = new Date().toISOString().split('T')[0]
@@ -167,11 +167,11 @@ export default function ReportScoresPage() {
 
         if (captain) {
           const captainMember: TeamMember = {
-            user_id: captain.id,
-            users: captain,
+            user_id: (captain as any).id,
+            users: captain as any,
           }
           // Add captain if not already in list
-          const hasCaptain = members?.some((m) => m.user_id === captain.id)
+          const hasCaptain = members?.some((m: any) => m.user_id === (captain as any).id)
           if (!hasCaptain) {
             setTeamMembers((prev) => [captainMember, ...prev])
           }
@@ -187,9 +187,9 @@ export default function ReportScoresPage() {
         .single()
 
       if (result) {
-        setExistingResult(result)
-        setSetsWon(result.sets_won.toString())
-        setSetsLost(result.sets_lost.toString())
+        setExistingResult(result as any)
+        setSetsWon((result as any).sets_won.toString())
+        setSetsLost((result as any).sets_lost.toString())
       } else {
         setExistingResult(null)
         setSetsWon('')
@@ -248,14 +248,14 @@ export default function ReportScoresPage() {
       }
 
       if (existingResult) {
-        const { error: updateError } = await supabase
+        const { error: updateError } = await (supabase
           .from('game_results')
-          .update(resultData)
+          .update as any)(resultData)
           .eq('id', existingResult.id)
 
         if (updateError) throw updateError
       } else {
-        const { error: insertError } = await supabase.from('game_results').insert(resultData)
+        const { error: insertError } = await supabase.from('game_results').insert(resultData as any)
 
         if (insertError) throw insertError
       }
@@ -278,7 +278,7 @@ export default function ReportScoresPage() {
 
         const { error: playersError } = await supabase
           .from('game_day_players')
-          .insert(playerInserts)
+          .insert(playerInserts as any)
 
         if (playersError) throw playersError
       }

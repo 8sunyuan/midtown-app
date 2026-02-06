@@ -77,9 +77,9 @@ export default function GameDaysPage() {
       .order('created_at', { ascending: false })
 
     if (!error && data) {
-      setSeasons(data)
+      setSeasons(data as any)
       if (data.length > 0 && !selectedSeason) {
-        setSelectedSeason(data[0].id)
+        setSelectedSeason((data as any)[0].id)
       }
     }
   }
@@ -163,9 +163,9 @@ export default function GameDaysPage() {
       }
 
       // Update game day
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase
         .from('game_days')
-        .update({
+        .update as any)({
           description,
           image_url: imageUrl,
         })

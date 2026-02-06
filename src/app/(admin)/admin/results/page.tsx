@@ -80,9 +80,9 @@ export default function ResultsPage() {
       .order('created_at', { ascending: false })
 
     if (!error && data) {
-      setSeasons(data)
+      setSeasons(data as any)
       if (data.length > 0 && !selectedSeason) {
-        setSelectedSeason(data[0].id)
+        setSelectedSeason((data as any)[0].id)
       }
     }
   }
@@ -185,7 +185,7 @@ export default function ResultsPage() {
         sets_lost: result.sets_lost,
       }))
 
-      const { error: insertError } = await supabase.from('game_results').insert(resultsToInsert)
+      const { error: insertError } = await supabase.from('game_results').insert(resultsToInsert as any)
 
       if (insertError) {
         setError('Failed to save results')

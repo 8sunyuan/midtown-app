@@ -146,7 +146,7 @@ export function TeamsClient({ user, initialTeams }: TeamsClientProps) {
         .insert({
           name: teamName,
           captain_id: user.id,
-        })
+        } as any)
         .select()
         .single()
 
@@ -162,10 +162,10 @@ export function TeamsClient({ user, initialTeams }: TeamsClientProps) {
 
       // Add captain as accepted member
       await supabase.from('team_members').insert({
-        team_id: team.id,
+        team_id: (team as any).id,
         user_id: user.id,
         status: 'accepted',
-      })
+      } as any)
 
       // Add other players
       const validEmails = playerEmails.filter((email) => email.trim() !== '')
@@ -189,10 +189,10 @@ export function TeamsClient({ user, initialTeams }: TeamsClientProps) {
           if (existingUser) {
             // Add as pending member
             await supabase.from('team_members').insert({
-              team_id: team.id,
-              user_id: existingUser.id,
+              team_id: (team as any).id,
+              user_id: (existingUser as any).id,
               status: 'accepted', // For now, auto-accept
-            })
+            } as any)
           }
         }
       }
@@ -284,9 +284,9 @@ export function TeamsClient({ user, initialTeams }: TeamsClientProps) {
         // User exists - add directly to team
         const { error: insertError } = await supabase.from('team_members').insert({
           team_id: selectedTeam.id,
-          user_id: existingUser.id,
+          user_id: (existingUser as any).id,
           status: 'accepted',
-        })
+        } as any)
 
         if (insertError) {
           if (insertError.code === '23505') {
@@ -314,7 +314,7 @@ export function TeamsClient({ user, initialTeams }: TeamsClientProps) {
           team_id: selectedTeam.id,
           email: email,
           invited_by: currentUser.id,
-        })
+        } as any)
 
         if (inviteError) {
           setError('Failed to send invite')

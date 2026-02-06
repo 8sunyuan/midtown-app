@@ -58,8 +58,8 @@ export default async function StandingsPage({
   // Default to active season or most recent
   let selectedSeasonId = params.season
   if (!selectedSeasonId && seasons && seasons.length > 0) {
-    const activeSeason = seasons.find((s: any) => s.status === 'active')
-    selectedSeasonId = activeSeason ? activeSeason.id : seasons[0].id
+    const activeSeason = (seasons as any).find((s: any) => s.status === 'active')
+    selectedSeasonId = activeSeason ? activeSeason.id : (seasons as any)[0].id
   }
 
   // Get standings for selected season

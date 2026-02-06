@@ -109,7 +109,7 @@ export default function SeasonsPage() {
         end_date: formData.end_date,
         recurring_config: recurringConfig,
         status: 'draft',
-      })
+      } as any)
       .select()
       .single()
 
@@ -164,7 +164,7 @@ export default function SeasonsPage() {
       currentDate.setDate(currentDate.getDate() + 7) // Next week
     }
 
-    const { error: insertError } = await supabase.from('game_days').insert(gameDays)
+    const { error: insertError } = await supabase.from('game_days').insert(gameDays as any)
 
     if (insertError) {
       setError('Failed to generate game days')
@@ -176,9 +176,9 @@ export default function SeasonsPage() {
   }
 
   const updateStatus = async (seasonId: string, newStatus: 'draft' | 'active' | 'completed') => {
-    const { error } = await supabase
+    const { error } = await (supabase
       .from('seasons')
-      .update({ status: newStatus })
+      .update as any)({ status: newStatus })
       .eq('id', seasonId)
 
     if (error) {
@@ -196,7 +196,7 @@ export default function SeasonsPage() {
     const { data } = await supabase.from('season_teams').select('team_id').eq('season_id', seasonId)
 
     if (data) {
-      setSelectedTeams(new Set(data.map((st) => st.team_id)))
+      setSelectedTeams(new Set((data as any).map((st: any) => st.team_id)))
     }
 
     setIsTeamDialogOpen(true)
@@ -218,7 +218,7 @@ export default function SeasonsPage() {
     }))
 
     if (teamsToInsert.length > 0) {
-      const { error: insertError } = await supabase.from('season_teams').insert(teamsToInsert)
+      const { error: insertError } = await supabase.from('season_teams').insert(teamsToInsert as any)
 
       if (insertError) {
         setError('Failed to save teams')
@@ -263,7 +263,7 @@ export default function SeasonsPage() {
         .eq('season_id', seasonId)
 
       if (gameDays && gameDays.length > 0) {
-        const gameDayIds = gameDays.map((gd) => gd.id)
+        const gameDayIds = (gameDays as any).map((gd: any) => gd.id)
         await supabase.from('game_day_results').delete().in('game_day_id', gameDayIds)
       }
 

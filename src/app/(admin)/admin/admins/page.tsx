@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { Database } from '@/types/database'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -69,7 +70,7 @@ export default function AdminManagementPage() {
         .from('users')
         .select('id')
         .eq('email', email)
-        .single()
+        .single<{ id: string }>()
 
       if (userError || !userData) {
         setError('User with this email not found')
@@ -80,7 +81,7 @@ export default function AdminManagementPage() {
       // Add to admin_users
       const { error: adminError } = await supabase
         .from('admin_users')
-        .insert({ user_id: userData.id })
+        .insert({ user_id: userData.id } as any)
 
       if (adminError) {
         if (adminError.code === '23505') {

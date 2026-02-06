@@ -36,7 +36,7 @@ export default async function SchedulePage({
     .select('id, name')
     .order('created_at', { ascending: false })
 
-  const selectedSeasonId = params.season || (seasons && seasons.length > 0 ? seasons[0].id : '')
+  const selectedSeasonId = params.season || (seasons && seasons.length > 0 ? (seasons as any)[0].id : '')
 
   // Get game days for selected season
   let gameDays: GameDay[] = []

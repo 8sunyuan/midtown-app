@@ -113,9 +113,9 @@ export default function NewslettersPage() {
 
       if (currentNewsletter) {
         // Update existing newsletter
-        const { error: updateError } = await supabase
+        const { error: updateError } = await (supabase
           .from('newsletters')
-          .update({
+          .update as any)({
             title,
             content,
           })
@@ -134,7 +134,7 @@ export default function NewslettersPage() {
           title,
           content,
           created_by: user.id,
-        })
+        } as any)
 
         if (insertError) {
           setError('Failed to create newsletter')
@@ -155,9 +155,9 @@ export default function NewslettersPage() {
   }
 
   const handlePublish = async (newsletterId: string, isPublished: boolean) => {
-    const { error } = await supabase
+    const { error } = await (supabase
       .from('newsletters')
-      .update({
+      .update as any)({
         published_at: isPublished ? null : new Date().toISOString(),
       })
       .eq('id', newsletterId)
