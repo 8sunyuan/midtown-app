@@ -1,6 +1,6 @@
 # Midtown Runs - Volleyball League Management System
 
-A full-stack web application for managing adult volleyball leagues, built with Next.js 15, Supabase, and TypeScript.
+A full-stack web application for managing adult volleyball leagues, built with Next.js 16, Supabase, and TypeScript.
 
 > 🏐 Features a custom volleyball-themed design with illustrated players and scoreboard aesthetics!
 
@@ -11,17 +11,16 @@ Get your volleyball league website up and running quickly:
 1. **Create a Supabase project** at [supabase.com](https://supabase.com)
 2. **Clone and install:**
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/8sunyuan/midtown-app.git
    cd midtown-app
    npm install
    ```
-3. **Create `.env.local`:**
+3. **Set up environment variables:**
    ```bash
-   NEXT_PUBLIC_SUPABASE_URL=your-project-url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-   INITIAL_ADMIN_EMAIL=your-email@example.com
+   cp .env.example .env.local
    ```
-4. **Run the migration** in Supabase SQL Editor: paste `supabase/migrations/001_initial_schema.sql`
+   Then fill in your Supabase URL and anon key (found in your Supabase project settings > API).
+4. **Run the migrations** in Supabase SQL Editor: paste and run each file in `supabase/migrations/` in order (001 through 004)
 5. **Start the dev server:** `npm run dev`
 6. **Register** with your admin email - you'll automatically become an admin!
 
@@ -41,13 +40,15 @@ For detailed instructions, see the [Setup Instructions](#setup-instructions) bel
 - User registration and authentication
 - Create and manage teams (max 10 players per team)
 - Invite players to teams via email
+- Report game results and track participating players
 - View upcoming game schedules
 - View season standings with win/loss records
+- Player leaderboard with individual stats
 - Read newsletters and announcements
 
 ## Tech Stack
 
-- **Framework:** Next.js 15 (App Router) with TypeScript
+- **Framework:** Next.js 16 (App Router) with TypeScript
 - **Database & Auth:** Supabase (PostgreSQL + Authentication + Storage)
 - **Styling:** Tailwind CSS + shadcn/ui components
 - **Hosting:** Vercel (recommended)
@@ -63,12 +64,10 @@ For detailed instructions, see the [Setup Instructions](#setup-instructions) bel
 
 1. **Clone the repository**
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/8sunyuan/midtown-app.git
    cd midtown-app
    npm install
    ```
-   
-   > 💡 **Tip:** You can copy `.env.example` to `.env.local` to get started with environment variables.
 
 2. **Create a Supabase project**
    - Go to [supabase.com](https://supabase.com) and create a new project
@@ -76,14 +75,17 @@ For detailed instructions, see the [Setup Instructions](#setup-instructions) bel
 
 3. **Set up environment variables**
    
-   Create a `.env.local` file in the root directory:
+   Copy the example file and fill in your values:
    ```bash
-   NEXT_PUBLIC_SUPABASE_URL=your-project-url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-   INITIAL_ADMIN_EMAIL=your-email@example.com
+   cp .env.example .env.local
    ```
 
-   You can find your Supabase URL and anon key in your Supabase project settings under API.
+   Then edit `.env.local` with your Supabase credentials:
+   - `NEXT_PUBLIC_SUPABASE_URL` - Your Supabase project URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Your Supabase anon/public key
+   - `INITIAL_ADMIN_EMAIL` - The email you'll register with to become the first admin
+
+   You can find your Supabase URL and anon key in your Supabase project settings under **API**.
    
    **Important:** Without these environment variables, the build will fail. Make sure to set them before running `npm run build` or `npm run dev`.
 
@@ -109,8 +111,11 @@ For detailed instructions, see the [Setup Instructions](#setup-instructions) bel
    
    In your Supabase project dashboard:
    - Go to the SQL Editor
-   - Copy the contents of `supabase/migrations/001_initial_schema.sql`
-   - Paste and run it
+   - Copy and run each migration file in order:
+     1. `supabase/migrations/001_initial_schema.sql`
+     2. `supabase/migrations/002_auto_admin_promotion.sql`
+     3. `supabase/migrations/003_player_stats.sql`
+     4. `supabase/migrations/004_team_invites.sql`
    
    > 📖 See `MIGRATION_GUIDE.md` for detailed migration strategies and best practices.
 
@@ -120,7 +125,7 @@ For detailed instructions, see the [Setup Instructions](#setup-instructions) bel
 
 6. **Configure your admin email**
    
-   Before registering, set your admin email in the database:
+   Migration 002 creates an `app_config` table with a default admin email (`admin@example.com`). Update it to your email before registering:
    
    ```sql
    UPDATE public.app_config 
@@ -158,22 +163,25 @@ For detailed instructions, see the [Setup Instructions](#setup-instructions) bel
 midtown-app/
 ├── src/
 │   ├── app/                    # Next.js App Router pages
-│   │   ├── (auth)/            # Authentication pages
-│   │   ├── (user)/            # User-facing pages
-│   │   ├── (admin)/           # Admin pages
-│   │   └── api/               # API routes
+│   │   ├── (admin)/           # Admin pages (seasons, results, newsletters, etc.)
+│   │   ├── (auth)/            # Authentication pages (login, register)
+│   │   ├── dashboard/         # User dashboard
+│   │   ├── newsletters/       # Public newsletters page
+│   │   ├── schedule/          # Game schedule page
+│   │   ├── standings/         # Season standings page
+│   │   └── teams/             # Teams management & game reporting
 │   ├── components/            # React components
 │   │   ├── ui/                # shadcn/ui components
-│   │   ├── admin/             # Admin-specific components
-│   │   └── user/              # User-facing components
+│   │   └── user/              # User-facing components (Navigation, SeasonSelector)
 │   ├── lib/                   # Utility libraries
 │   │   ├── supabase/          # Supabase client configs
 │   │   └── utils/             # Helper functions
 │   └── types/                 # TypeScript type definitions
 ├── supabase/
-│   ├── migrations/            # Database migrations
+│   ├── migrations/            # Database migrations (001-004)
 │   └── seed.sql               # Seed data
 └── public/                    # Static assets
+    └── images/                # Volleyball-themed images
 ```
 
 ## Database Schema
@@ -182,19 +190,24 @@ The application uses the following main tables:
 
 - `users` - User profiles (linked to Supabase Auth)
 - `admin_users` - Admin designations
+- `app_config` - Application configuration (e.g., initial admin email)
 - `teams` - Team information
 - `team_members` - Team rosters (max 10 per team)
+- `team_invites` - Pending team invitations by email
 - `seasons` - League seasons with recurring schedules
 - `season_teams` - Teams participating in seasons with standings
 - `game_days` - Individual game days with schedules
 - `game_results` - Game results (sets won/lost)
+- `game_day_players` - Players who participated in each game day
+- `player_stats` - Aggregated player statistics
 - `newsletters` - Announcements and newsletters
+- `player_leaderboard` - View for player rankings by win percentage
 
 ## Deployment
 
 ### Deploy to Vercel
 
-1. Push your code to GitHub
+1. Fork or clone the repository to your GitHub account
 2. Go to [vercel.com](https://vercel.com) and import your repository
 3. Add your environment variables in the Vercel project settings
 4. Deploy!
@@ -229,7 +242,6 @@ Make sure to add these in your Vercel project settings:
 
 - Email notifications for schedules and newsletters
 - Team statistics dashboard
-- Player individual stats
 - Mobile app
 - Export standings to PDF
 - Game day check-in system
